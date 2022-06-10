@@ -85,9 +85,11 @@ def handler(event, context):
         if is_member.status == 204:
             return {
                 "isAuthorized": True,
-                "context": {
-                    "Membership": github_org
-                }
+                "context": json.loads(user.data)
+                #    {
+                #    "Membership": github_org,
+                #    "github_login": user_login
+                #}
             }
 
     return {

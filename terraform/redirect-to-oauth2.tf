@@ -1,4 +1,4 @@
- locals {
+locals {
   redirect_oauth2_function_name = "${var.resource_name_prefix}-redirect-2authenticator"
 }
 
@@ -28,35 +28,43 @@ module "redirect_to_oauth2" {
 }
 
 resource "aws_iam_policy" "allow_dynamodb" {
-  name = "${var.resource_name_prefix}-allow-dynamodb-oauth-authorizer"
-  path = "/${var.resource_name_prefix}/"
+  name   = "${var.resource_name_prefix}-allow-dynamodb-oauth-authorizer"
+  path   = "/${var.resource_name_prefix}/"
   policy = jsonencode(
-    {
-      Statement = [
-        {
-          "Effect" : "Allow",
-          "Action" : [
-            "dynamodb:UpdateTimeToLive",
-            "dynamodb:PutItem",
-            "dynamodb:DescribeTable",
-            "dynamodb:GetItem",
-            "dynamodb:Query",
-            "dynamodb:UpdateItem"
-          ],
-          "Resource" : "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:table/${local.dynamodb_table_name}"
-        },
-        {
-          "Effect" : "Allow",
-          "Action" : "ssm:GetParameter",
-          "Resource" : "arn:aws:ssm:${local.region}:${local.account_id}:parameter${local.ssm_path_invoke_url}*"
-        }
-      ]
-      Version = "2012-10-17"
-    }
+  {
+    Statement = [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "dynamodb:UpdateTimeToLive",
+          "dynamodb:PutItem",
+          "dynamodb:DescribeTable",
+          "dynamodb:GetItem",
+          "dynamodb:Query",
+          "dynamodb:UpdateItem"
+        ],
+        "Resource" : "arn:aws:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:table/${local.dynamodb_table_name}"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : "ssm:GetParameter",
+        "Resource" : "arn:aws:ssm:${local.region}:${local.account_id}:parameter${local.ssm_path_invoke_url}*"
+      }
+    ]
+    Version   = "2012-10-17"
+  }
   )
 }
 
 resource "aws_iam_role_policy_attachment" "allow_dynamodb_4oauth_authorizer" {
   role       = module.redirect_to_oauth2.lambda_role_name
   policy_arn = aws_iam_policy.allow_dynamodb.arn
+}
+
+resource "aws_lambda_permission" "redirect_to_oauth2" {
+  statement_id  = "AllowAPIInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = module.redirect_to_oauth2.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${module.api_oauth2_authorizer.apigatewayv2_api_execution_arn}/*/*/*"
 }
