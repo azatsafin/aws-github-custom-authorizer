@@ -53,10 +53,12 @@ module "api_oauth2_authorizer" {
 #  }
 #}
 #
-resource "aws_lambda_permission" "redirect_oath2" {
+
+resource "aws_lambda_permission" "authorized_lambda" {
   statement_id  = "AllowAPIInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = local.redirect_oauth2_function_name
+  function_name = element(split(":", "arn:aws:lambda:eu-central-1:297478128798:function:github-vpn-demo-get-user-conf"),
+  length(split(":", "arn:aws:lambda:eu-central-1:297478128798:function:github-vpn-demo-get-user-conf"))-1)
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${module.api_oauth2_authorizer.apigatewayv2_api_execution_arn}/*/*/*"
 }
