@@ -12,5 +12,5 @@ You could install it manually or by provided terraform module under ==terraform=
 The deployment example under ==test-deployment== directory.
 
 ### Diagram
-![diagram](github_custom_authorizer.png).
+![diagram](https://lucid.app/publicSegments/view/f8d3ec1f-f82a-4a59-bd89-5be1341a78cd/image.png).
 
