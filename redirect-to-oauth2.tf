@@ -17,7 +17,7 @@ module "redirect_to_oauth2" {
   memory_size     = 512
   timeout         = 30
   package_type    = "Zip"
-  source_path     = "${path.module}/../lambdas/redirect_to_oauth2"
+  source_path     = "${path.module}/lambdas/redirect_to_oauth2"
 
   environment_variables = {
     CLIENT_ID            = var.client_id

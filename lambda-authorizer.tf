@@ -17,7 +17,7 @@ module "lambda_authorizer" {
   memory_size     = 512
   timeout         = 30
   package_type    = "Zip"
-  source_path     = "${path.module}/../lambdas/lambda_authorizer"
+  source_path     = "${path.module}/lambdas/lambda_authorizer"
 
   environment_variables = {
     CLIENT_ID            = var.client_id
